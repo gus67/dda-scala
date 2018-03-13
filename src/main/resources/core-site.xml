@@ -1,0 +1,135 @@
+<!--Wed Aug  3 15:13:37 2016-->
+<configuration>
+
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://hadoop</value>
+        <final>true</final>
+    </property>
+
+    <property>
+        <name>fs.hdfs.impl</name>
+        <value>org.apache.hadoop.hdfs.DistributedFileSystem</value>
+        <description>The FileSystem for hdfs: uris.</description>
+    </property>
+
+    <property>
+        <name>fs.trash.interval</name>
+        <value>360</value>
+    </property>
+
+    <property>
+        <name>ha.zookeeper.quorum</name>
+        <value>ndl-bass-ys-vm-129-186:2181,ndl-bass-ys-vm-129-187:2181,ndl-bass-ys-vm-129-188:2181</value>
+    </property>
+
+    <property>
+        <name>hadoop.proxyuser.hcat.groups</name>
+        <value>users</value>
+    </property>
+
+    <property>
+        <name>hadoop.proxyuser.hcat.hosts</name>
+        <value>ndl-bass-ys-vm-129-186</value>
+    </property>
+
+    <property>
+        <name>hadoop.proxyuser.hive.groups</name>
+        <value>users</value>
+    </property>
+
+    <property>
+        <name>hadoop.proxyuser.hive.hosts</name>
+        <value>ndl-bass-ys-vm-129-186</value>
+    </property>
+
+    <property>
+        <name>hadoop.security.auth_to_local</name>
+        <value>
+            RULE:[2:$1@$0]([rn]m@.*)s/.*/yarn/
+            RULE:[2:$1@$0](jhs@.*)s/.*/mapred/
+            RULE:[2:$1@$0]([nd]n@.*)s/.*/hdfs/
+            RULE:[2:$1@$0](hm@.*)s/.*/hbase/
+            RULE:[2:$1@$0](rs@.*)s/.*/hbase/
+            DEFAULT
+        </value>
+    </property>
+
+    <property>
+        <name>hadoop.security.authentication</name>
+        <value>simple</value>
+    </property>
+
+    <property>
+        <name>hadoop.security.authorization</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>hadoop.security.bdoc.access.id</name>
+        <value></value>
+    </property>
+
+    <property>
+        <name>hadoop.security.bdoc.access.key</name>
+        <value></value>
+    </property>
+
+    <property>
+        <name>hadoop.security.enable.bdoc.authentication</name>
+        <value></value>
+    </property>
+
+    <property>
+        <name>io.compression.codecs</name>
+        <value>
+            org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.SnappyCodec
+        </value>
+    </property>
+
+    <property>
+        <name>io.file.buffer.size</name>
+        <value>131072</value>
+    </property>
+
+    <property>
+        <name>io.serializations</name>
+        <value>org.apache.hadoop.io.serializer.WritableSerialization</value>
+    </property>
+
+    <property>
+        <name>ipc.client.connect.max.retries</name>
+        <value>50</value>
+    </property>
+
+    <property>
+        <name>ipc.client.connection.maxidletime</name>
+        <value>30000</value>
+    </property>
+
+    <property>
+        <name>ipc.client.idlethreshold</name>
+        <value>8000</value>
+    </property>
+
+    <property>
+        <name>ipc.server.tcpnodelay</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>mapreduce.jobtracker.webinterface.trusted</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>net.topology.script.file.name</name>
+        <value>/etc/hadoop/conf/rack-aware.sh</value>
+    </property>
+
+    <property>
+        <name>proxyuser_group</name>
+        <value>users</value>
+    </property>
+
+</configuration>

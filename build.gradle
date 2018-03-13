@@ -1,0 +1,55 @@
+buildscript {
+    ext.scala_version = '2.12.4'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+group 'cn.migu'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'scala'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-compiler', version: '2.12.4'
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.21.0.1'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'org.apache.kafka', name: 'kafka-clients', version: '1.0.0'
+    compile group: 'org.apache.poi', name: 'poi', version: '3.17'
+    compile('org.apache.hadoop:hadoop-common:2.9.0') {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
+    compile group: 'org.apache.hadoop', name: 'hadoop-hdfs', version: '2.9.0'
+}
+
+jar {
+    def today = new Date().format('yyyyMMdd_hhmmss')
+    archiveName = "dda" + today + ".jar"
+    println("start jar ...")
+    manifest {
+        attributes 'Main-Class': 'cn.migu.DDA'
+    }
+
+}
+
+task copyJars(type: Copy) {
+
+    println("========================runtime========================")
+    configurations.runtime.each { println("\u001b[32m$it.path") }
+
+    println "========================compile========================"
+    configurations.compile.each { println("\u001b[36m$it.path") }
+
+    from configurations.compile
+    into '/Users/guxichang/lib/dda'
+}

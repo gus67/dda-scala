@@ -2,6 +2,8 @@ package cn.migu.core
 
 import java.io.File
 
+import cn.migu.utils.SqliteDataSourceProvider
+import cn.migu.utils.SqliteDataSourceProvider.createDataSource
 import cn.migu.vo.DDAFile
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor
 import org.slf4j.LoggerFactory
@@ -43,7 +45,8 @@ class FoundFile extends FileAlterationListenerAdaptor() {
 
             InitFileSystem.reg_quene_map(x).put(new DDAFile(file.getName, file.getPath, InitFileSystem.reg_sinks_map(x)))
 
-            println(InitFileSystem.reg_quene_map)
+            SqliteDataSourceProvider.createDataSource().getConnection.createStatement().executeUpdate(
+              s"insert into files values ('','$x','${file.getPath}',0,0,datetime('now','localtime'))")
 
             log.info(s"\u001b[35;1m${file.getPath} write to quene pass $x \u001b[0m\n".replace("),", ""))
 

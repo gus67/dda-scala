@@ -14,6 +14,8 @@ object InitFileSystem {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
+  val file2KafkaSeek = mutable.HashMap[String,Int]()
+
   val USER_DIR = System.getProperty("user.dir")
 
   //正则与输出源对应表

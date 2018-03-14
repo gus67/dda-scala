@@ -3,7 +3,7 @@ package cn.migu
 import java.util.concurrent.{Executors, TimeUnit}
 
 import cn.migu.core.{FoundFile, InitFileSystem}
-import cn.migu.utils.{KafkaUtils, LogUtils, PluginUtils}
+import cn.migu.utils.{KafkaUtils, LogUtils, PluginUtils, SqliteDataSourceProvider}
 import cn.migu.vo.{FtpSink, HdfsSink, KafkaSink}
 import org.apache.commons.io.monitor.{FileAlterationMonitor, FileAlterationObserver}
 import org.slf4j.{Logger, LoggerFactory}
@@ -28,7 +28,7 @@ object DDA {
 
     val interval = TimeUnit.SECONDS.toMillis(1)
     val observer = new FileAlterationObserver(InitFileSystem.root_path)
-    observer.addListener(new FoundFile)
+    observer.addListener(new FoundFile())
     //创建文件变化监听器
     val monitor = new FileAlterationMonitor(interval, observer)
     // 开始监控
@@ -72,7 +72,7 @@ object DDA {
 
                 tmpFileArr += lastFileName
 
-                println("lastFileName----->"+lastFileName)
+                //println("lastFileName----->" + lastFileName)
               }
 
               //转码
@@ -80,7 +80,7 @@ object DDA {
 
               if (res.indexOf("utf-8") == -1 && res.indexOf("us-ascii") == -1) {
 
-                println("fileName----->"+fileName)
+                //println("fileName----->" + fileName)
 
                 if (os.indexOf("linux") != -1) {
 
@@ -96,7 +96,7 @@ object DDA {
                 }
               }
 
-              println("tmpFileArr------>"+tmpFileArr)
+              //println("tmpFileArr------>" + tmpFileArr)
 
               for (sink <- sinks) {
 
@@ -127,5 +127,24 @@ object DDA {
         }
       })
     }
+
+
+    //间隔一秒刷盘，记录seek，当文件完全成功，会直接删除map中记录，若文件不成功，下次断点的文件将被延续
+    Executors.newSingleThreadExecutor().submit(new Runnable {
+      override def run(): Unit = {
+        while (true) {
+          try {
+            for ((x, y) <- InitFileSystem.file2KafkaSeek) {
+              SqliteDataSourceProvider.createDataSource().getConnection.createStatement().executeUpdate(
+                s"update files set seek = $y where path = '$x'")
+            }
+            Thread.sleep(100L)
+          } catch {
+            case ex: Exception => log.error(s"SingleThreadExecutor fatal error ---> ${LogUtils.getTrace(ex)}")
+          }
+
+        }
+      }
+    })
   }
 }

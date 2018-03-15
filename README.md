@@ -11,9 +11,9 @@ version | update | items
 🔗 [Scala 菜鸟教程](http://www.runoob.com/scala/scala-tutorial.html)
 
 
-####最大挑战之
+#### 最大挑战之
 
-1、发送性幂等问题
+### 1、发送性幂等问题
 
 0.11之后支持幂等性发送和夸topic事务处理
 

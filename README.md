@@ -14,9 +14,11 @@ version | update | items
 ## 环境说明
 
 1、测试服务器kafka 对应的地址
+
 /up/kafka_2.11-1.0.0/bin/kafka-console-consumer.sh --bootstrap-server 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093 --new-consumer --topic t6
 
 2、测试服务器Hdfs 对应的地址
+
 hdfs://hadoop （hdfs://192.168.129.186:8020/）
 
 -----

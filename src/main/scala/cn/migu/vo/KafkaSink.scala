@@ -3,7 +3,7 @@ package cn.migu.vo
 class KafkaSink(val bootServr: String, val topic: String) {
 
 
-  override def toString = s"\nKafkaSink==>$bootServr, $topic\n"
+  override def toString = s"KafkaSink==>$bootServr, $topic"
 
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[KafkaSink]

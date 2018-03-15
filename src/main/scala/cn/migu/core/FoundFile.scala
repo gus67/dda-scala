@@ -2,8 +2,6 @@ package cn.migu.core
 
 import java.io.File
 
-import cn.migu.utils.SqliteDataSourceProvider
-import cn.migu.utils.SqliteDataSourceProvider.createDataSource
 import cn.migu.vo.DDAFile
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor
 import org.slf4j.LoggerFactory
@@ -35,24 +33,26 @@ class FoundFile extends FileAlterationListenerAdaptor() {
       //发现了新的文件先对文件进行正则过滤
       val regSet = InitFileSystem.reg_sinks_map.keySet
 
+      var notFound = true
       val loop = new Breaks
 
       loop.breakable {
 
+        //任意文件只会匹配到一个正则
         for (x <- regSet) {
 
           if (new Regex(x) findFirstIn file.getName nonEmpty) {
 
             InitFileSystem.reg_quene_map(x).put(new DDAFile(file.getName, file.getPath, InitFileSystem.reg_sinks_map(x)))
 
-            SqliteDataSourceProvider.createDataSource().getConnection.createStatement().executeUpdate(
-              s"insert into files values ('','$x','${file.getPath}',0,0,datetime('now','localtime'))")
+            log.info(s"\n\u001b[35;1m${file.getPath} 匹配到一个正则 $x \u001b[0m\n".replace("),", ""))
 
-            log.info(s"\u001b[35;1m${file.getPath} write to quene pass $x \u001b[0m\n".replace("),", ""))
+            notFound = false
 
             loop.break
           }
         }
+        if (notFound) log.info(s"\n\u001b[35;1m${file.getPath} 不能在 $regSet 匹配到任何一个正则  \u001b[0m\n")
       }
     }
   }

@@ -3,7 +3,7 @@ package cn.migu
 import java.util.concurrent.{Executors, TimeUnit}
 
 import cn.migu.core.{FoundFile, InitFileSystem}
-import cn.migu.utils.{KafkaUtils, LogUtils, PluginUtils, SqliteDataSourceProvider}
+import cn.migu.utils.{KafkaUtils, LogUtils, PluginUtils}
 import cn.migu.vo.{FtpSink, HdfsSink, KafkaSink}
 import org.apache.commons.io.monitor.{FileAlterationMonitor, FileAlterationObserver}
 import org.slf4j.{Logger, LoggerFactory}
@@ -49,7 +49,7 @@ object DDA {
 
               val tmpFileArr = mutable.Buffer[String](path)
 
-              log.info(s"\u001b[36;1m$path ready to sinks $sinks \u001b[0m\n".replace(")", ""))
+              log.info(s"\n\u001b[36;1m$path 被阻塞队列获得,即将向 $sinks 写入\u001b[0m\n".replace(")", "").replace("ArrayBuffer(",""))
 
               /**
                 * 1、反射
@@ -121,7 +121,7 @@ object DDA {
               //所有文件都发送成功
 
             } catch {
-              case ex: Exception => log.error(s"SingleThreadExecutor fatal error ---> ${LogUtils.getTrace(ex)}")
+              case ex: Exception => log.error(s"线程池发生一个严重错误 ---> ${LogUtils.getTrace(ex)}")
             }
           }
         }
@@ -132,18 +132,7 @@ object DDA {
     //间隔一秒刷盘，记录seek，当文件完全成功，会直接删除map中记录，若文件不成功，下次断点的文件将被延续
     Executors.newSingleThreadExecutor().submit(new Runnable {
       override def run(): Unit = {
-        while (true) {
-          try {
-            for ((x, y) <- InitFileSystem.file2KafkaSeek) {
-              SqliteDataSourceProvider.createDataSource().getConnection.createStatement().executeUpdate(
-                s"update files set seek = $y where path = '$x'")
-            }
-            Thread.sleep(100L)
-          } catch {
-            case ex: Exception => log.error(s"SingleThreadExecutor fatal error ---> ${LogUtils.getTrace(ex)}")
-          }
 
-        }
       }
     })
   }

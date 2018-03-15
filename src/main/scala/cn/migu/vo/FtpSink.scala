@@ -3,7 +3,7 @@ package cn.migu.vo
 class FtpSink(val ip: String, val port: Int, val name: String, val passwd: String, val path: String) {
 
 
-  override def toString = s"\nFtpSink==>$ip, $port, $name, $passwd, $path\n"
+  override def toString = s"\nFtpSink==>$ip, $port, $name, $passwd, $path"
 
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[FtpSink]

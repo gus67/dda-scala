@@ -3,7 +3,7 @@ package cn.migu.vo
 class HdfsSink(val path: String) {
 
 
-  override def toString = s"\nHdfsSink==>$path\n"
+  override def toString = s"HdfsSink==>$path"
 
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[HdfsSink]

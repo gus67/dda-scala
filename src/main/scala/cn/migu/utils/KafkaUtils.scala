@@ -23,7 +23,8 @@ class KafkaUtils {
     props.put("bootstrap.servers", kafkaSink.bootServr)
     props.put("acks", "all")
     props.put("transactional.id", System.currentTimeMillis().toString)
-    props.put("max.in.flight.requests.per.connection", "1")
+    props.put("enable.idempotence","true")
+    props.put("max.in.flight.requests.per.connection","1")
 
     // 打开重试机制必须让max.in.flight.requests.per.connection等于1,否则在发生重排序的时候，不允许重试
     //props.put("max.in.flight.requests.per.connection", "1")
@@ -35,7 +36,6 @@ class KafkaUtils {
     props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
     props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 
-    for (topic <- kafkaSink.topic.split(",")) {
 
       val producer = new KafkaProducer[String, String](props)
 
@@ -51,7 +51,7 @@ class KafkaUtils {
 
         for (line <- lines) {
 
-          producer.send(new ProducerRecord(topic, "", line), new KafkaProducerSendCallback(n, tmpFiles.head))
+          producer.send(new ProducerRecord(kafkaSink.topic, "", line))
 
           n += 1
 
@@ -59,12 +59,8 @@ class KafkaUtils {
 
         producer.commitTransaction()
 
-        SqliteDataSourceProvider.createDataSource().getConnection.createStatement().executeUpdate(
-          s"update files set status = 1,seek = $n where path = '${tmpFiles.head}'")
+        log.info(s"\n\u001b[33;1m${tmpFiles.last} $n 行全部 写入 Kafka ---> ${kafkaSink.bootServr}/${kafkaSink.topic} 成功  \u001b[0m\n")
 
-        InitFileSystem.file2KafkaSeek.remove(tmpFiles.head)
-
-        log.info(s"\n\u001b[33;1m${tmpFiles.last} 写入 Kafka ---> ${kafkaSink.bootServr}/$topic 成功  \u001b[0m\n")
 
         FileUtils.moveFile(new File(tmpFiles.head), new File(tmpFiles.head + ".COMPLETED"))
 
@@ -78,15 +74,11 @@ class KafkaUtils {
         }
 
       } catch {
-        //case _: ProducerFencedException => producer.close()
-        //case _: OutOfOrderSequenceException => producer.close()
-        //case _: AuthorizationException => producer.close()
-        //case _: KafkaException => producer.abortTransaction()
-        case _: Exception => producer.abortTransaction()
+
+        case _: Exception =>
+          producer.abortTransaction()
 
       }
       producer.close()
-
-    }
   }
 }

@@ -14,9 +14,7 @@ object InitFileSystem {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  val file2KafkaSeek = mutable.HashMap[String,Int]()
-
-  val USER_DIR = System.getProperty("user.dir")
+  val USER_DIR: String = System.getProperty("user.dir")
 
   //正则与输出源对应表
   var reg_sinks_map: Map[String, CS] = Map()
@@ -67,12 +65,7 @@ object InitFileSystem {
             x.split(" ")(3), x.split(" ")(4), x.split(" ")(5))))
         }
       }
+      log.info(s"\u001b[33;1m$x")
     }
-
-    log.info(s"配置文件解析\n\u001b[33;1m ${reg_sinks_map.toString().replace("(", "\n").replace(")", "").replace("\n,", "")} \u001b[0m\n")
-
-    //创建文件数据库
-
-
   }
 }

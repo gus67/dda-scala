@@ -22,7 +22,7 @@ version | update | items
 -----
 ## 分布式传输系统处理流程
 
-![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/1.png)
+![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/2.png)
 
 -----
 

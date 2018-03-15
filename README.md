@@ -14,8 +14,11 @@ version | update | items
 # 环境说明
 
 > 1、测试服务器kafka 对应的地址
+>
 > /up/kafka_2.11-1.0.0/bin/kafka-console-consumer.sh --bootstrap-server 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093 --new-consumer --topic t6
+>
 > 2、测试服务器Hdfs 对应的地址
+>
 > hdfs://hadoop （hdfs://192.168.129.186:8020/）
 
 
@@ -29,5 +32,6 @@ version | update | items
 ## 1、发送幂等性问题处理
 
 >单分区幂等性: 幂等producer无法实现多分区上的幂等性。如前所述，若要实现多分区上的原子性，需要引入事务
+>
 >单会话幂等性: 幂等producer无法跨会话实现幂等性。即使同一个producer宕机并重启也无法保证消息的EOS语义
 

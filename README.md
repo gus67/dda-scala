@@ -27,14 +27,17 @@ version | update | items
 #### 实例代码模拟 1-1
 
 ```scala
-for (i <- 1 to 200000) {
-
-      producer.send(new ProducerRecord("t6", "", i.toString), new KafkaProducerSendCallback(i, ""))
-
-      if(i==9000) System.exit(1)
-
-    }
-
+...  
+...  
+...
+    for (i <- 1 to 200000) {
+    
+          producer.send(new ProducerRecord("t6", "", i.toString), new KafkaProducerSendCallback(i, ""))
+    
+          if (i == 9000) System.exit(1)
+    
+        }
+    
     producer.close()
 ```
 

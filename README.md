@@ -11,7 +11,16 @@ version | update | items
 🔗 [Scala 菜鸟教程](http://www.runoob.com/scala/scala-tutorial.html)
 
 -----
-## <center>分布式传输系统处理流程</center>
+## 环境说明
+
+1、测试服务器kafka 对应的地址
+/up/kafka_2.11-1.0.0/bin/kafka-console-consumer.sh --bootstrap-server 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093 --new-consumer --topic t6
+
+2、测试服务器Hdfs 对应的地址
+hdfs://hadoop （hdfs://192.168.129.186:8020/）
+
+-----
+## 分布式传输系统处理流程
 
 ![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/1.png)
 

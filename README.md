@@ -11,9 +11,11 @@ version | update | items
 🔗 [Scala 菜鸟教程](http://www.runoob.com/scala/scala-tutorial.html)
 
 -----
+## <center>分布式传输系统处理流程</center>
 
 ![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/1.png)
 
+-----
 
 ### 最大挑战之
 

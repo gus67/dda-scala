@@ -10,10 +10,14 @@ version | update | items
 
 🔗 [Scala 菜鸟教程](http://www.runoob.com/scala/scala-tutorial.html)
 
+-----
+
+![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/1.png)
+
 
 ### 最大挑战之
 
----
+-----
 
 #### 1、发送幂等性问题处理
 
@@ -22,7 +26,7 @@ version | update | items
    由于文本发送存在kafka集群宕机，客户端程序宕机，客户端程序异常等问题，发送的文本可能部分成功
 导致Exactly once（精确的一次）存在巨大挑战，在同一个KafkaProducer下可能实现幂等性发送，只是针对kafka
 内部的重试机制，而对外部的或业务方的重复发送消息，并不能在源头上解决这个问题，即使通过callback
-可以知道当前成功的消息，但是不能确保ack一定能够到达，这个的挑战留在后续版本实现？
+可以知道当前成功的消息，但是不能确保ack一定能够到达，这个的挑战留在后续版本实现
 
 #### 当前版本只能确保非极端情况发生示例Demo
 

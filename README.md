@@ -22,31 +22,52 @@ version | update | items
    由于文本发送存在kafka集群宕机，客户端程序宕机，客户端程序异常等问题，发送的文本可能部分成功
 导致Exactly once（精确的一次）存在巨大挑战，在同一个KafkaProducer下可能实现幂等性发送，只是针对kafka
 内部的重试机制，而对外部的或业务方的重复发送消息，并不能在源头上解决这个问题，即使通过callback
-可以知道当前成功的消息，但是不能确保ack一定能够到达，所以这个巨大的挑战该如何实现？
+可以知道当前成功的消息，但是不能确保ack一定能够到达，这个的挑战留在后续版本实现？
 
-#### 实例代码模拟 1-1
+#### 当前版本只能确保非极端情况发生示例Demo
 
 ```scala
-...  
-...  
-...
-    for (i <- 1 to 200000) {
-    
-          producer.send(new ProducerRecord("t6", "", i.toString), new KafkaProducerSendCallback(i, ""))
-    
-          if (i == 9000) System.exit(1)
-    
+      val producer = new KafkaProducer[String, String](props)
+
+      val lines = Source.fromFile(tmpFiles.last).getLines()
+
+      producer.initTransactions()
+
+      var n = 0
+
+      try {
+
+        producer.beginTransaction()
+
+        for (line <- lines) {
+
+          producer.send(new ProducerRecord(kafkaSink.topic, "", line))
+
+          n += 1
+
         }
-    
-    producer.close()
+
+        producer.commitTransaction()
+
+        log.info(s"\n\u001b[33;1m${tmpFiles.last} $n 行全部 写入 Kafka ---> ${kafkaSink.bootServr}/${kafkaSink.topic} 成功  \u001b[0m\n")
+
+        FileUtils.moveFile(new File(tmpFiles.head), new File(tmpFiles.head + ".COMPLETED"))
+
+        log.info(s"\n\u001b[33;1m${tmpFiles.head} ---> ${tmpFiles.head}.COMPLETED  \u001b[0m\n")
+
+        for (f <- tmpFiles.takeRight(tmpFiles.size - 1)) {
+
+          FileUtils.forceDelete(new File(f))
+
+          log.info(s"\n\u001b[34;1m$f ---> removed  \u001b[0m\n")
+        }
+
+      } catch {
+
+        case _: Exception =>
+          producer.abortTransaction()
+
+      }
+      producer.close()
 ```
-
-如1-1所示 在9000模拟一次随机客户端宕机，这个时候在kafka集群，可以收到部分数据，0-9000随机不等
-
-我们希望一些解决方案可以解决上面的问题
-
-1、像数据库一样，要么全部成功要么全部失败
-
-2、下一次再发送这些数据的时候，像kafka内部重试机制一样，再次发送相同的消息，服务端直接屏蔽掉，对用户透明
-
 

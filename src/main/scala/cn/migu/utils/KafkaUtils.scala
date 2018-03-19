@@ -9,6 +9,8 @@ import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.KafkaException
+import org.apache.kafka.common.errors.{AuthorizationException, OutOfOrderSequenceException, ProducerFencedException}
 
 import scala.collection.mutable
 import scala.io.Source
@@ -23,8 +25,8 @@ class KafkaUtils {
     props.put("bootstrap.servers", kafkaSink.bootServr)
     props.put("acks", "all")
     props.put("transactional.id", System.currentTimeMillis().toString)
-    props.put("enable.idempotence","true")
-    props.put("max.in.flight.requests.per.connection","1")
+    props.put("enable.idempotence", "true")
+    props.put("max.in.flight.requests.per.connection", "1")
 
     // 打开重试机制必须让max.in.flight.requests.per.connection等于1,否则在发生重排序的时候，不允许重试
     //props.put("max.in.flight.requests.per.connection", "1")
@@ -37,48 +39,45 @@ class KafkaUtils {
     props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 
 
-      val producer = new KafkaProducer[String, String](props)
+    val producer = new KafkaProducer[String, String](props)
 
-      val lines = Source.fromFile(tmpFiles.last).getLines()
+    val lines = Source.fromFile(tmpFiles.last).getLines()
 
-      producer.initTransactions()
+    producer.initTransactions()
 
-      var n = 0
+    var n = 0
 
-      try {
+    try {
 
-        producer.beginTransaction()
+      producer.beginTransaction()
 
-        for (line <- lines) {
+      for (line <- lines) {
 
-          producer.send(new ProducerRecord(kafkaSink.topic, "", line))
+        producer.send(new ProducerRecord(kafkaSink.topic, "", line))
 
-          n += 1
-
-        }
-
-        producer.commitTransaction()
-
-        log.info(s"\n\u001b[33;1m${tmpFiles.last} $n 行全部 写入 Kafka ---> ${kafkaSink.bootServr}/${kafkaSink.topic} 成功  \u001b[0m\n")
-
-
-        FileUtils.moveFile(new File(tmpFiles.head), new File(tmpFiles.head + ".COMPLETED"))
-
-        log.info(s"\n\u001b[33;1m${tmpFiles.head} ---> ${tmpFiles.head}.COMPLETED  \u001b[0m\n")
-
-        for (f <- tmpFiles.takeRight(tmpFiles.size - 1)) {
-
-          FileUtils.forceDelete(new File(f))
-
-          log.info(s"\n\u001b[34;1m$f ---> removed  \u001b[0m\n")
-        }
-
-      } catch {
-
-        case _: Exception =>
-          producer.abortTransaction()
+        n += 1
 
       }
-      producer.close()
+
+      producer.commitTransaction()
+
+      log.info(s"\n\u001b[33;1m${tmpFiles.last} $n 行全部 写入 Kafka ---> ${kafkaSink.bootServr}/${kafkaSink.topic} 成功  \u001b[0m\n")
+
+      FileUtils.moveFile(new File(tmpFiles.head), new File(tmpFiles.head + ".COMPLETED"))
+
+      log.info(s"\n\u001b[33;1m${tmpFiles.head} ---> ${tmpFiles.head}.COMPLETED  \u001b[0m\n")
+
+      for (f <- tmpFiles.takeRight(tmpFiles.size - 1)) {
+
+        FileUtils.forceDelete(new File(f))
+
+        log.info(s"\n\u001b[34;1m$f ---> removed  \u001b[0m\n")
+      }
+
+    } catch {
+      case _@(_: ProducerFencedException | _: OutOfOrderSequenceException | _: AuthorizationException) => producer.close()
+      case _: KafkaException => producer.abortTransaction()
+    }
+    producer.close()
   }
 }

@@ -3,7 +3,7 @@ package cn.migu
 import java.util.concurrent.{Executors, TimeUnit}
 
 import cn.migu.core.{FoundFile, InitFileSystem}
-import cn.migu.utils.{KafkaUtils, LogUtils, PluginUtils}
+import cn.migu.utils.{HdfsUtils, KafkaUtils, LogUtils, PluginUtils}
 import cn.migu.vo.{FtpSink, HdfsSink, KafkaSink}
 import org.apache.commons.io.monitor.{FileAlterationMonitor, FileAlterationObserver}
 import org.slf4j.{Logger, LoggerFactory}
@@ -49,7 +49,7 @@ object DDA {
 
               val tmpFileArr = mutable.Buffer[String](path)
 
-              log.info(s"\n\u001b[36;1m$path 被阻塞队列获得,即将向 $sinks 写入\u001b[0m\n".replace(")", "").replace("ArrayBuffer(",""))
+              log.info(s"\n\u001b[36;1m$path 被阻塞队列获得,即将向 $sinks 写入\u001b[0m\n".replace(")", "").replace("ArrayBuffer(", ""))
 
               /**
                 * 1、反射
@@ -76,7 +76,7 @@ object DDA {
               }
 
               //转码
-              val res = s"file --mime-encoding $lastFileName" !!
+              val res = Seq("bash", "-c", s"file --mime-encoding $lastFileName") !!
 
               if (res.indexOf("utf-8") == -1 && res.indexOf("us-ascii") == -1) {
 
@@ -84,17 +84,27 @@ object DDA {
 
                 if (os.indexOf("linux") != -1) {
 
-                  s"iconv -f gbk -t utf-8 $lastFileName -o $lastFileName.UTF-8 " !!
+                  Seq("bash", "-c", s"iconv -f gbk -t utf-8 $lastFileName -o $lastFileName.UTF-8 ") !!
 
                   tmpFileArr += s"$lastFileName.UTF-8"
 
                 } else {
 
-                  s"iconv -c -f gbk -t utf-8 $lastFileName" #> new java.io.File(s"$lastFileName.UTF-8") !!
+                  Seq("bash", "-c", s"iconv -c -f gbk -t utf-8 $lastFileName > $lastFileName.UTF-8") !!
 
                   tmpFileArr += s"$lastFileName.UTF-8"
                 }
               }
+
+              //awk '$0="/user/monitor/1.txt="NR"\037 "$0' 1.txt > 2.txt
+
+
+              //文件名+行号
+
+              Seq("bash", "-c", "awk '$0=\"" + path + "=\"NR\"\037 \"$0' " + lastFileName + " > " + s"$lastFileName.LINE_NUM") !!
+
+              tmpFileArr += s"$lastFileName.LINE_NUM"
+
 
               //println("tmpFileArr------>" + tmpFileArr)
 
@@ -106,7 +116,8 @@ object DDA {
                     new KafkaUtils().kafkaProducer4DDA(k, tmpFileArr)
 
                   case h: HdfsSink =>
-                    println(s"${h.path}")
+
+                    new HdfsUtils().hdfsPut4DDA(h, tmpFileArr)
 
                   case f: FtpSink =>
                     println(s"${f.ip} ${f.name}")
@@ -115,7 +126,6 @@ object DDA {
 
                 }
               }
-
 
 
               //所有文件都发送成功

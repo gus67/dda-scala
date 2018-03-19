@@ -28,7 +28,8 @@ class FoundFile extends FileAlterationListenerAdaptor() {
       && !file.getName.toUpperCase().endsWith(".FTP")
       && !file.getName.toUpperCase().endsWith(".COMPLETED")
       && !file.getName.toUpperCase().endsWith(".TRANSITION")
-      && !file.getName.toUpperCase().endsWith(".ICONV")) {
+      && !file.getName.toUpperCase().endsWith(".ICONV")
+      && !file.getName.toUpperCase().endsWith(".LINE_NUM")) {
 
       //发现了新的文件先对文件进行正则过滤
       val regSet = InitFileSystem.reg_sinks_map.keySet

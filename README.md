@@ -23,7 +23,7 @@ version | update | items
 ![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/2.png)
 
 
-# 分布式传输系统开发流程文档
+# 分布式传输系统开发文档概要
 
 1、初始化配置文件，获得关键属性
 
@@ -73,3 +73,84 @@ val s = Seq("bash", "-c", s"find ${InitFileSystem.root_path} -type f  ! -name '*
     }
   }
 ```
+
+4、并行的一个线程，文件发现线程，发现自进程启动以后，实时侦测文件下CREATE文件是件，侦测后的文件处理逻辑同3
+
+```scala
+ val interval = TimeUnit.SECONDS.toMillis(5)
+
+ val observer = new FileAlterationObserver(InitFileSystem.root_path)
+
+ observer.addListener(new FoundFile())
+
+ //创建文件变化监听器
+ val monitor = new FileAlterationMonitor(interval, observer)
+
+ // 开始监控
+ monitor.start()
+```
+
+5、并行的多个队列处理线程，每一个队列向目标Sink发送数据
+
+```scala
+for ((_, v) <- InitFileSystem.reg_quene_map) {
+
+      Executors.newSingleThreadExecutor().submit(new Runnable {
+
+      override def run(): Unit = {
+
+        val abq = v
+
+        var fileTmp = ""
+
+        while (true) {
+
+          try {
+          
+             val dda = abq.take
+...
+...
+... 略
+
+}
+
+/**
+  * 实际处理细节
+  * 1、插件化反射     PluginUtils.reflectPlugin(clazz.split("!!")(0), clazz.split("!!")(1), path, lastFileName)
+  * 
+  * 2、转码          val res = Seq("bash", "-c", s"file --mime-encoding $lastFileName") !!
+  * 
+  *                           Seq("bash", "-c", s"iconv -f gbk -t utf-8 $lastFileName -o $tmpPath.UTF-8 ") !!
+  *                           
+  * 3、文件头+行号   Seq("bash", "-c", "awk '$0=\"" + path + "=\"NR\"\037 \"$0' " + tmpFileArr.last + " > " + s"${tmpFileArr.last}.LINE_NUM") !!
+  * 
+  */
+
+```
+
+6、队列内部处理逻辑
+
+```scala
+ for (sink <- sinks) {
+
+                sink match {
+
+                  case k: KafkaSink =>
+
+                    new KafkaUtils().kafkaProducer4DDA(k, tmpFileArr)
+
+                  case h: HdfsSink =>
+
+                    new HdfsUtils().hdfsPut4DDA(h, tmpFileArr)
+
+                  case f: FtpSink =>
+                   
+                     .
+                     .
+                     .
+                  case _ => println("error")
+                }
+              }
+```
+
+7、所有失败的文件均在当前包下.failed,由运维处理

@@ -35,6 +35,7 @@ class FoundFile extends FileAlterationListenerAdaptor() {
       val regSet = InitFileSystem.reg_sinks_map.keySet
 
       var notFound = true
+
       val loop = new Breaks
 
       loop.breakable {

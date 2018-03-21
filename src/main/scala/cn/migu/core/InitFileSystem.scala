@@ -36,31 +36,46 @@ object InitFileSystem {
     val cfg_it = Source.fromFile(configPath).getLines()
 
     var tmp_clazz: String = null
+
     var tmp_reg: String = null
 
     cfg_it.foreach { x =>
+
       if (x.startsWith("RP")) {
+
         root_path = x.split(" ")(1)
       } else if (x.startsWith("REG")) {
+
         tmp_clazz = x.split(" ")(2)
+
         tmp_reg = x.split(" ")(1)
+
         reg_quene_map += (tmp_reg -> new ArrayBlockingQueue(MAX_QUENE_LENGTH))
       } else if (x.startsWith("K")) {
+
         if (reg_sinks_map.contains(tmp_reg)) {
+
           reg_sinks_map(tmp_reg).sinks += new KafkaSink(x.split(" ")(1), x.split(" ")(2))
         } else {
+
           reg_sinks_map += tmp_reg -> new CS(tmp_clazz, mutable.Buffer(new KafkaSink(x.split(" ")(1), x.split(" ")(2))))
         }
       } else if (x.startsWith("H")) {
+
         if (reg_sinks_map.contains(tmp_reg)) {
+
           reg_sinks_map(tmp_reg).sinks += new HdfsSink(x.split(" ")(1), x.split(" ")(2))
         } else {
+
           reg_sinks_map += tmp_reg -> new CS(tmp_clazz, mutable.Buffer(new HdfsSink(x.split(" ")(1), x.split(" ")(2))))
         }
       } else if (x.startsWith("F")) {
+
         if (reg_sinks_map.contains(tmp_reg)) {
+
           reg_sinks_map(tmp_reg).sinks += new FtpSink(x.split(" ")(1), x.split(" ")(2).toInt, x.split(" ")(3), x.split(" ")(4), x.split(" ")(5))
         } else {
+
           reg_sinks_map += tmp_reg -> new CS(tmp_clazz, mutable.Buffer(new FtpSink(x.split(" ")(1), x.split(" ")(2).toInt,
             x.split(" ")(3), x.split(" ")(4), x.split(" ")(5))))
         }
@@ -72,6 +87,5 @@ object InitFileSystem {
   def getFileNameWithSuffix(pathandname: String): String = {
 
     pathandname.substring(pathandname.lastIndexOf("/") + 1)
-
   }
 }

@@ -8,9 +8,6 @@ version | update | items
 
 🔗 [Scala 中文官方文档](http://docs.scala-lang.org/zh-cn/overviews/)
 
-🔗 [Scala 菜鸟教程](http://www.runoob.com/scala/scala-tutorial.html)
-
-
 # 环境说明
 
 > 1、测试服务器kafka 对应的地址
@@ -30,5 +27,6 @@ version | update | items
 ## 1、发送幂等性问题处理
 
 >单分区幂等性: 幂等producer无法实现多分区上的幂等性。如前所述，若要实现多分区上的原子性，需要引入事务
+>
 >单会话幂等性: 幂等producer无法跨会话实现幂等性。即使同一个producer宕机并重启也无法保证消息的EOS语义
 

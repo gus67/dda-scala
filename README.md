@@ -108,9 +108,10 @@ for ((_, v) <- InitFileSystem.reg_quene_map) {
           try {
           
              val dda = abq.take
-...
-...
-... 略
+             .
+             .
+             .
+             略
 
 }
 
@@ -148,6 +149,7 @@ for ((_, v) <- InitFileSystem.reg_quene_map) {
                      .
                      .
                      .
+                     略
                   case _ => println("error")
                 }
               }

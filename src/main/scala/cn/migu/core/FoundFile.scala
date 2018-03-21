@@ -46,14 +46,14 @@ class FoundFile extends FileAlterationListenerAdaptor() {
 
             InitFileSystem.reg_quene_map(x).put(new DDAFile(file.getName, file.getPath, InitFileSystem.reg_sinks_map(x)))
 
-            log.info(s"\n\u001b[35;1m${file.getPath} 匹配到一个正则 $x \u001b[0m\n".replace("),", ""))
+            log.info(s"\n\u001b[34;1m${file.getPath} 匹配到一个正则 $x \u001b[0m\n".replace("),", ""))
 
             notFound = false
 
             loop.break
           }
         }
-        if (notFound) log.info(s"\n\u001b[35;1m${file.getPath} 不能在 $regSet 匹配到任何一个正则  \u001b[0m\n")
+        if (notFound) log.info(s"\n\u001b[33;1m${file.getPath} 不能在 $regSet 匹配到任何一个正则  \u001b[0m\n")
       }
     }
   }

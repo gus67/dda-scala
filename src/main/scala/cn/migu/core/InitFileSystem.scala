@@ -9,10 +9,10 @@ import scala.collection.mutable
 
 import scala.io.Source
 
-
 object InitFileSystem {
 
   private val log = LoggerFactory.getLogger(this.getClass)
+
 
   val USER_DIR: String = System.getProperty("user.dir")
 
@@ -53,9 +53,9 @@ object InitFileSystem {
         }
       } else if (x.startsWith("H")) {
         if (reg_sinks_map.contains(tmp_reg)) {
-          reg_sinks_map(tmp_reg).sinks += new HdfsSink(x.split(" ")(1))
+          reg_sinks_map(tmp_reg).sinks += new HdfsSink(x.split(" ")(1), x.split(" ")(2))
         } else {
-          reg_sinks_map += tmp_reg -> new CS(tmp_clazz, mutable.Buffer(new HdfsSink(x.split(" ")(1))))
+          reg_sinks_map += tmp_reg -> new CS(tmp_clazz, mutable.Buffer(new HdfsSink(x.split(" ")(1), x.split(" ")(2))))
         }
       } else if (x.startsWith("F")) {
         if (reg_sinks_map.contains(tmp_reg)) {
@@ -65,7 +65,13 @@ object InitFileSystem {
             x.split(" ")(3), x.split(" ")(4), x.split(" ")(5))))
         }
       }
-      log.info(s"\u001b[33;1m$x")
+      log.info(s"\u001b[34;1m$x \u001b[0m")
     }
+  }
+
+  def getFileNameWithSuffix(pathandname: String): String = {
+
+    pathandname.substring(pathandname.lastIndexOf("/") + 1)
+
   }
 }

@@ -117,13 +117,15 @@ for ((_, v) <- InitFileSystem.reg_quene_map) {
 
 /**
   * 实际处理细节
-  * 1、插件化反射     PluginUtils.reflectPlugin(clazz.split("!!")(0), clazz.split("!!")(1), path, lastFileName)
+  * 1、插件化反射     
+  * PluginUtils.reflectPlugin(clazz.split("!!")(0), clazz.split("!!")(1), path, lastFileName)
   * 
-  * 2、转码          val res = Seq("bash", "-c", s"file --mime-encoding $lastFileName") !!
-  * 
-  *                           Seq("bash", "-c", s"iconv -f gbk -t utf-8 $lastFileName -o $tmpPath.UTF-8 ") !!
+  * 2、转码       
+  * Seq("bash", "-c", s"file --mime-encoding $lastFileName") !!
+  * Seq("bash", "-c", s"iconv -f gbk -t utf-8 $lastFileName -o $tmpPath.UTF-8 ") !!
   *                           
-  * 3、文件头+行号   Seq("bash", "-c", "awk '$0=\"" + path + "=\"NR\"\037 \"$0' " + tmpFileArr.last + " > " + s"${tmpFileArr.last}.LINE_NUM") !!
+  * 3、文件头+行号   
+  * Seq("bash", "-c", "awk '$0=\"" + path + "=\"NR\"\037 \"$0' " + tmpFileArr.last + " > " + s"${tmpFileArr.last}.LINE_NUM") !!
   * 
   */
 

@@ -17,6 +17,9 @@ version | update | items
 > 2、测试服务器Hdfs 对应的地址
 > hdfs://hadoop （hdfs://192.168.129.186:8020/）
 
+#分布式传输系统组件架构图
+
+![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/DDA-zj.png)
 
 # 分布式传输系统处理流程概要图
 
@@ -158,3 +161,5 @@ for ((_, v) <- InitFileSystem.reg_quene_map) {
 ```
 
 7、所有失败的文件均在当前包下.failed,由运维处理
+
+# 测试说明

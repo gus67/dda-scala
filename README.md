@@ -17,7 +17,7 @@ version | update | items
 > 2、测试服务器Hdfs 对应的地址
 > hdfs://hadoop （hdfs://192.168.129.186:8020/）
 
-#分布式传输系统组件架构图
+# 分布式传输系统组件架构图
 
 ![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/DDA-zj.png)
 

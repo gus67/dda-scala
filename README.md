@@ -11,11 +11,31 @@ version | update | items
 
 # 环境说明
 
-> 1、测试服务器kafka 对应的地址
-> /up/kafka_2.11-1.0.0/bin/kafka-console-consumer.sh --bootstrap-server 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093 --new-consumer --topic t6
+> 1、测试服务器kafka 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093
 >
-> 2、测试服务器Hdfs 对应的地址
-> hdfs://hadoop （hdfs://192.168.129.186:8020/）
+> 2、测试服务器Hdfs  hdfs://hadoop （hdfs://192.168.129.186:8020/）
+
+# 测试文档
+
+1、配置文件说明
+
+```config
+RP /Users/guxichang/monitor
+
+REG ^[\s\S]*\.log1$ cn.migu.utils.SimulationPlugin!!foo
+K 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093 t6
+
+REG ^[\s\S]*\.log2$ NA
+K 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093 t7
+
+REG ^[\s\S]*\.log3$ NA
+H hdfs://hadoop/dda/d3/ YMD
+
+REG ^[\s\S]*\.log4$ NA
+H hdfs://hadoop/dda/d4 YMDH
+
+```
+
 
 # 分布式传输系统组件架构图
 
@@ -187,5 +207,3 @@ Executors.newSingleThreadExecutor().submit(new Runnable {
       }
     })
 ```
-
-# 测试说明

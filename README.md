@@ -21,11 +21,6 @@ version | update | items
 
 ![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/DDA-zj.png)
 
-# 分布式传输系统处理流程概要图
-
-![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/2.png)
-
-
 # 分布式传输系统开发文档概要
 
 1、初始化配置文件，获得关键属性

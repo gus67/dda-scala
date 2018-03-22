@@ -58,7 +58,7 @@ val s = Seq("bash", "-c", s"find ${InitFileSystem.root_path} -type f  ! -name '*
 3、验证扫描出来的文件是否符合正则表达，符合正则表达的一律放进相应的队列之中
 
 ```scala
- loop.breakable {
+loop.breakable {
 
 //任意文件只会匹配到一个正则
   for (x <- regSet) {
@@ -96,21 +96,32 @@ val s = Seq("bash", "-c", s"find ${InitFileSystem.root_path} -type f  ! -name '*
 5、并行的多个队列处理线程，每一个队列向目标Sink发送数据
 
 ```scala
-for ((_, v) <- InitFileSystem.reg_quene_map) {
 
-      Executors.newSingleThreadExecutor().submit(new Runnable {
+//毒丸控制
+val pp = new Breaks
 
-      override def run(): Unit = {
+while (true) {
 
-        val abq = v
+  pp.breakable {
 
-        var fileTmp = ""
+    try {
 
-        while (true) {
+      val dda = abq.take
 
-          try {
-          
-             val dda = abq.take
+      val path = dda.path
+
+      if (path.endsWith(".POISON_PILL")) {
+
+        log.info(s"\n\u001b[32;1m ######## 发现毒丸文件，侦测文件到\u001b[0m\u001b[35;1m $k \u001b[0m\u001b[32;1m队列运行正常 ########！！！ \u001b[0m\n")
+
+        pp.break()
+      }
+
+      val fileName = dda.fileName
+
+      val clazz = dda.cs.clazz
+
+      val sinks = dda.cs.sinks
              .
              .
              .
@@ -137,29 +148,49 @@ for ((_, v) <- InitFileSystem.reg_quene_map) {
 6、队列内部处理逻辑
 
 ```scala
- for (sink <- sinks) {
+for (sink <- sinks) {
 
-                sink match {
+  sink match {
 
-                  case k: KafkaSink =>
+    case k: KafkaSink =>
 
-                    new KafkaUtils().kafkaProducer4DDA(k, tmpFileArr)
+      new KafkaUtils().kafkaProducer4DDA(k, tmpFileArr)
 
-                  case h: HdfsSink =>
+    case h: HdfsSink =>
 
-                    new HdfsUtils().hdfsPut4DDA(h, tmpFileArr)
+      new HdfsUtils().hdfsPut4DDA(h, tmpFileArr)
 
-                  case f: FtpSink =>
+    case f: FtpSink =>
                    
                      .
                      .
                      .
                      略
-                  case _ => println("error")
                 }
               }
 ```
 
-7、所有失败的文件均在当前包下.failed,由运维处理
+7、毒丸线程
+
+```scala
+Executors.newSingleThreadExecutor().submit(new Runnable {
+      
+  override def run(): Unit = {
+
+    while (true) {
+
+      log.info(s"\n\u001b[34;1m ######## 开始生成毒丸 ########\u001b[0m\n")
+
+       Seq("bash", "-c", s"rm -rf ${InitFileSystem.root_path}/*.POISON_PILL") !!
+
+       Thread.sleep(5 * 1000)
+
+       Seq("bash", "-c", s"touch ${InitFileSystem.root_path}/${System.currentTimeMillis()}.POISON_PILL") !!
+
+       Thread.sleep(5 * 1000)
+        }
+      }
+    })
+```
 
 # 测试说明

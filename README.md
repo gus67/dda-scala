@@ -9,6 +9,11 @@ version | update | items
 
 🔗 [Scala 中文官方文档](http://docs.scala-lang.org/zh-cn/overviews/)
 
+
+# 分布式传输系统组件架构图
+
+![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/DDA-zj.png)
+
 # 环境说明
 
 > 1、测试服务器kafka 172.18.111.4:9093,172.18.111.5:9093,172.18.111.6:9093
@@ -55,10 +60,6 @@ H HdfsSink YMDH（按小时分区） YMD（按天分区）YM（按月分区） Y
 
 ### 7、日志观测
 
-
-# 分布式传输系统组件架构图
-
-![Alt text](https://github.com/gus67/dda-scala/blob/master/src/main/resources/DDA-zj.png)
 
 # 分布式传输系统开发文档概要
 

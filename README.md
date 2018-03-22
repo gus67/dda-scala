@@ -35,6 +35,13 @@ REG ^[\s\S]*\.log4$ NA
 H hdfs://hadoop/dda/d4 YMDH
 
 ```
+RP 表示根目录
+
+REG 表示正则 反射插件类!!方法 如果没有用NA表示
+
+K kafkaSink topic（只能1个）
+
+H HdfsSink YMDH（按小时分区） YMD（按天分区）YM（按月分区） Y（按年分区）
 
 
 # 分布式传输系统组件架构图
